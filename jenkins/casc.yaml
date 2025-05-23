@@ -1,0 +1,18 @@
+jenkins:
+  systemMessage: "Jenkins as Code - Terraform MovieSphere"
+  numExecutors: 2
+  remotingSecurity:
+    enabled: true
+
+  nodes:
+    - permanent:
+        name: "terraform-agent"
+        remoteFS: "/home/jenkins"
+        labels: "terraform"
+        launcher:
+          docker:
+            dockerHost: "unix:///var/run/docker.sock"
+            image: "terraform-agent:latest"
+            user: "jenkins"
+            volumes:
+              - "/var/jenkins_home:/var/jenkins_home"

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: ./jenkins
+    container_name: jenkinsmoviesphere
+    ports:
+      - "5040:8080"
+      - "50040:50000"
+    volumes:
+      - jenkins_moviesphere:/var/jenkins_home
+    networks:
+      - jenkins_moviesphere
+
+  terraform-agent:
+    build:
+      context: ./agent-terraform
+    networks:
+      - jenkins_moviesphere
+
+volumes:
+  jenkins_moviesphere:
+
+networks:
+  jenkins_moviesphere:
+    driver: bridge
