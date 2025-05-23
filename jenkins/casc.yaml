@@ -19,6 +19,8 @@ jenkins:
               image: "terraform-agent:latest"
               volumes:
                 - "/var/jenkins_home:/var/jenkins_home"
+              environment:
+                - "JENKINS_AGENT_WORKDIR=/home/jenkins"
             connector:
               jnlp:
                 user: "jenkins"

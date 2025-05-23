@@ -13,12 +13,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - jenkins_moviesphere
+    restart: unless-stopped
 
   terraform-agent:
     build:
       context: ./agent-terraform
     networks:
       - jenkins_moviesphere
+    restart: unless-stopped
 
 volumes:
   jenkins_moviesphere:

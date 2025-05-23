@@ -1,5 +1,8 @@
-configuration-as-code
-generic-webhook-trigger
-docker-plugin
-workflow-aggregator
-git
+configuration-as-code:latest
+docker-plugin:latest
+workflow-aggregator:latest
+git:latest
+cloudbees-folder:latest
+configuration-as-code-support:latest
+credentials:latest
+credentials-binding:latest
