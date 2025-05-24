@@ -3,3 +3,4 @@ indexing
 *.xml
 *.iml
 .idea
+.env
