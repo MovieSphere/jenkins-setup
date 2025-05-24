@@ -1,0 +1,65 @@
+pipeline {
+    agent {
+        label 'terraform'
+    }
+    
+    environment {
+        TERRAFORM_DIR = 'terraform'
+    }
+    
+    options {
+        ansiColor('xterm')
+        disableConcurrentBuilds()
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Terraform Init') {
+            steps {
+                dir(TERRAFORM_DIR) {
+                    wrap([$class: 'MaskPasswordsBuildWrapper']) {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+        
+        stage('Terraform Plan') {
+            steps {
+                dir(TERRAFORM_DIR) {
+                    wrap([$class: 'MaskPasswordsBuildWrapper']) {
+                        sh 'terraform plan -out=tfplan'
+                        archiveArtifacts artifacts: "${TERRAFORM_DIR}/tfplan"
+                    }
+                }
+            }
+        }
+        
+        stage('Approval') {
+            steps {
+                input message: '¿Proceder con el apply?', ok: 'Continuar'
+            }
+        }
+        
+        stage('Terraform Apply') {
+            steps {
+                dir(TERRAFORM_DIR) {
+                    wrap([$class: 'MaskPasswordsBuildWrapper']) {
+                        sh 'terraform apply -auto-approve tfplan'
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+    }
+} 

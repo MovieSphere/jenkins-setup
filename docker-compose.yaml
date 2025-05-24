@@ -11,12 +11,18 @@ services:
       - "50000:50000"
     volumes:
       - jenkins_moviesphere:/var/jenkins_home
-      - ./casc.yml:/var/jenkins_home/casc_configs/casc.yml
+      - ./jenkins/casc.yaml:/var/jenkins_home/casc_configs/casc.yaml
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/casc.yml
     networks:
       - jenkins_moviesphere
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     # restart: unless-stopped
 
   terraform-agent:
@@ -25,16 +31,17 @@ services:
     image: terraform-agent:latest
     environment:
       - JENKINS_URL=http://jenkins:8080
+      - JENKINS_AGENT_NAME=terraform-agent
+      - JENKINS_AGENT_WORKDIR=/home/jenkins/agent
+      - JENKINS_SECRET=${JENKINS_SECRET}
+      - JENKINS_AGENT_PORT=50000
+      - JENKINS_PROTOCOLS=JNLP4-connect
+      - JENKINS_INSTANCE_IDENTITY=${JENKINS_INSTANCE_IDENTITY}
     networks:
       - jenkins_moviesphere
     depends_on:
-      - jenkins
-    command: <
-      sh -c "java -jar /usr/share/jenkins/agent.jar \
-      -jnlpUrl http://jenkins:8080/computer/terraform-agent/slave-agent.jnlp \
-      -secret SECRET_JENKINS \
-      -name terraform-agent \
-      -workDir /home/jenkins/agent"
+      jenkins:
+        condition: service_healthy
 
 volumes:
   jenkins_moviesphere:

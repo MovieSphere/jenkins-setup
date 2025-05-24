@@ -12,4 +12,13 @@ RUN apt-get update && \
     terraform -version && \
     rm terraform_${LATEST_TF}_linux_amd64.zip
 
+# Crear directorio del agente y ajustar permisos
+RUN mkdir -p /home/jenkins/agent && \
+    chown -R jenkins:jenkins /home/jenkins
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 USER jenkins
+
+ENTRYPOINT ["/entrypoint.sh"]
