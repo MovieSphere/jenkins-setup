@@ -5,25 +5,40 @@ services:
     build:
       context: ./jenkins
     container_name: jenkinsmoviesphere
+    user: root
     ports:
-      - "5040:8080"
-      - "50040:50000"
+      - "5050:8080"
+      - "50000:50000"
     volumes:
       - jenkins_moviesphere:/var/jenkins_home
+      - ./casc.yml:/var/jenkins_home/casc_configs/casc.yml
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/casc.yml
     networks:
       - jenkins_moviesphere
-    restart: unless-stopped
+    # restart: unless-stopped
 
   terraform-agent:
     build:
       context: ./agent-terraform
+    image: terraform-agent:latest
+    environment:
+      - JENKINS_URL=http://jenkins:8080
     networks:
       - jenkins_moviesphere
-    restart: unless-stopped
+    depends_on:
+      - jenkins
+    command: <
+      sh -c "java -jar /usr/share/jenkins/agent.jar \
+      -jnlpUrl http://jenkins:8080/computer/terraform-agent/slave-agent.jnlp \
+      -secret SECRET_JENKINS \
+      -name terraform-agent \
+      -workDir /home/jenkins/agent"
 
 volumes:
   jenkins_moviesphere:
+  terraform_data:
 
 networks:
   jenkins_moviesphere:

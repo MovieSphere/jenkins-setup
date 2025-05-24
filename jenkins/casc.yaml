@@ -1,31 +1,14 @@
 jenkins:
   systemMessage: "Jenkins as Code - Terraform MovieSphere"
   numExecutors: 0
-  clouds:
-    - docker:
-        name: "terraform-cloud"
+  docker:
+    clouds:
+      - name: "terraform-cloud"
         dockerApi:
-          dockerHost:
-            uri: "unix:///var/run/docker.sock"
-        containerCap: 3
+          dockerHost: "unix:///var/run/docker.sock"
+        jenkinsUrl: "http://jenkins:8080"
         templates:
-          - name: "terraform-agent"
-            labelString: "terraform"
-            remoteFs: "/home/jenkins"
-            instanceCap: 2
-            mode: EXCLUSIVE
-            pullStrategy: PULL_NEVER
-            dockerTemplateBase:
-              image: "terraform-agent:latest"
-              volumes:
-                - "/var/jenkins_home:/var/jenkins_home"
-              environment:
-                - "JENKINS_AGENT_WORKDIR=/home/jenkins"
-            connector:
-              jnlp:
-                user: "jenkins"
-                jenkinsUrl: "http://host.docker.internal:5040/"  # Solo si corre en Docker y se accede desde el host
-
-unclassified:
-  location:
-    url: "http://localhost:5040/"
+          - labelString: "terraform-agent"
+            image: "terraform-agent:latest"
+            remoteFS: "/home/jenkins/agent"
+            instanceCapStr: "5"

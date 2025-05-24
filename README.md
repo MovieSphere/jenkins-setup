@@ -1,1 +1,4 @@
 # jenkins-setup
+
+docker-compose --env-file .env build
+docker-compose up -d
